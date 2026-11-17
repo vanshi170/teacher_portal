@@ -30,3 +30,7 @@ yarn-error.log*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Keep student personal records out of GitHub
+student-backend/data/batch_2025_29.json
+student-scanner/src/data/batch_2025_29.json
