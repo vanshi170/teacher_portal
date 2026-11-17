@@ -1,6 +1,5 @@
 import { API_BASE } from '../config/api';
 import type { Student, DashboardData, TimetableEntry, AttendanceHistoryItem } from '../types';
-import { MOCK_DASHBOARDS, MOCK_TIMETABLE, MOCK_HISTORY } from '../data/mockData';
 
 export async function checkBackendHealth(): Promise<boolean> {
   try {
@@ -34,6 +33,7 @@ export async function loginStudent(prn: string, password: string): Promise<{ stu
   return data;
 }
 
+
 export async function registerStudent(data: {
   name: string;
   prn: string;
@@ -43,95 +43,51 @@ export async function registerStudent(data: {
   section: string;
   semester: number;
 }): Promise<{ student: Student; token: string }> {
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      return await res.json();
-    }
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || 'Failed to register student');
-  } catch (err: any) {
-    // If backend is unreachable, create local mock session
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.name === 'TypeError') {
-      const newStudent: Student = {
-        id: `local-${Date.now()}`,
-        name: data.name,
-        prn: data.prn.toUpperCase(),
-        email: data.email,
-        department: data.department,
-        section: data.section.toUpperCase(),
-        semester: data.semester
-      };
-      return {
-        student: newStudent,
-        token: `mock-jwt-token-for-${newStudent.prn}`
-      };
-    }
-    throw err;
-  }
+  const res = await fetch(`${API_BASE}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(result.error || 'Failed to register student');
+  if (!result.student || !result.token) throw new Error('Registration response was incomplete.');
+  return result;
 }
 
-export async function fetchDashboard(token: string, studentPrn?: string): Promise<DashboardData> {
-  if (token && !token.startsWith('mock-')) {
-    try {
-      const res = await fetch(`${API_BASE}/api/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch {
-      // Fallback to mock on network fail
-    }
-  }
 
-  // Return realistic mock dashboard
-  const prn = studentPrn || '25070521001';
-  return MOCK_DASHBOARDS[prn] || MOCK_DASHBOARDS['25070521001'];
+export async function fetchDashboard(token: string, _studentPrn?: string): Promise<DashboardData> {
+  if (!token || token.startsWith('mock-')) throw new Error('Please log in again.');
+  const res = await fetch(`${API_BASE}/api/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Unable to load dashboard.');
+  return data;
 }
+
 
 export async function fetchTimetable(token: string, day?: number): Promise<TimetableEntry[]> {
-  if (token && !token.startsWith('mock-')) {
-    try {
-      const url = day ? `${API_BASE}/api/timetable?day=${day}` : `${API_BASE}/api/timetable`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.timetable) return data.timetable;
-      }
-    } catch {
-      // Fallback
-    }
-  }
-
-  if (day) {
-    return MOCK_TIMETABLE.filter(item => item.dayOfWeek === day);
-  }
-  return MOCK_TIMETABLE;
+  if (!token || token.startsWith('mock-')) throw new Error('Please log in again.');
+  const url = day ? `${API_BASE}/api/timetable?day=${day}` : `${API_BASE}/api/timetable`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Unable to load timetable.');
+  if (!Array.isArray(data.timetable)) throw new Error('Invalid timetable response.');
+  return data.timetable;
 }
 
+
 export async function fetchAttendanceHistory(token: string): Promise<AttendanceHistoryItem[]> {
-  if (token && !token.startsWith('mock-')) {
-    try {
-      const res = await fetch(`${API_BASE}/api/attendance/history`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.history) return data.history;
-      }
-    } catch {
-      // Fallback
-    }
-  }
-  return MOCK_HISTORY;
+  if (!token || token.startsWith('mock-')) throw new Error('Please log in again.');
+  const res = await fetch(`${API_BASE}/api/attendance/history`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Unable to load attendance history.');
+  if (!Array.isArray(data.history)) throw new Error('Invalid attendance history response.');
+  return data.history;
 }
 
 export async function submitAttendanceScan(
