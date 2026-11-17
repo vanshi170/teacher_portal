@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/useAuth';
-import { DEMO_STUDENTS } from '../data/mockData';
 import { 
   GraduationCap, 
   Lock, 
   User, 
   ArrowRight, 
-  Sparkles, 
   AlertCircle,
   Wifi,
   ShieldCheck
@@ -17,7 +15,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
-  const { login, register, selectDemoStudent, isBackendConnected, recheckConnection } = useAuth();
+  const { login, register, isBackendConnected, recheckConnection } = useAuth();
   const [tab, setTab] = useState<'login' | 'register'>('login');
   
   // Login form state
@@ -90,10 +88,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     }
   };
 
-  const handleDemoSelect = (prn: string) => {
-    selectDemoStudent(prn);
-    if (onSuccess) onSuccess();
-  };
+
 
   return (
     <div className="min-h-screen bg-canvas flex flex-col justify-center items-center px-4 py-8 relative overflow-hidden">
@@ -120,7 +115,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
           <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border bg-white/70 backdrop-blur-sm shadow-sm">
             <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-present-green animate-pulse' : 'bg-amber-500'}`} />
             <span className="text-muted">
-              {isBackendConnected ? 'Backend Server Online (Port 10000)' : 'Running with Demo State'}
+              {isBackendConnected ? 'Backend Server Online (Port 10000)' : 'Backend connection unavailable'}
             </span>
             <button 
               onClick={() => recheckConnection()} 
@@ -335,40 +330,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
             </form>
           )}
 
-          {/* Quick Demo Login Preset Buttons */}
-          <div className="mt-6 pt-5 border-t border-hot-pink/15">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-muted mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-hot-pink" />
-              <span>Instant One-Click Demo Accounts:</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {DEMO_STUDENTS.slice(0, 4).map((demo) => (
-                <button
-                  key={demo.prn}
-                  type="button"
-                  onClick={() => handleDemoSelect(demo.prn)}
-                  className="text-left p-2.5 rounded-xl border border-hot-pink/20 bg-canvas/40 hover:bg-hot-pink/10 hover:border-hot-pink/40 transition-all group flex flex-col justify-between"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-ink group-hover:text-hot-pink transition-colors truncate">
-                      {demo.name}
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white text-muted border border-hot-pink/15">
-                      Sec {demo.section}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1 text-[11px] text-muted">
-                    <span className="font-mono">{demo.prn}</span>
-                    <span className={`font-semibold ${demo.defaultAttendance >= 75 ? 'text-present-green' : 'text-absent-red'}`}>
-                      {demo.defaultAttendance}%
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
           </div>
-
-        </div>
 
         {/* Security Footer */}
         <div className="mt-4 text-center flex items-center justify-center gap-4 text-xs text-muted">

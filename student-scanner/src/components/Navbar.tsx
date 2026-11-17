@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
               >
                 <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-present-green animate-pulse' : 'bg-amber-500'}`} />
                 <span className="text-muted hidden lg:inline">
-                  {isBackendConnected ? 'Backend Live' : 'Demo Mode'}
+                  {isBackendConnected ? 'Backend Live' : 'Backend Offline'}
                 </span>
                 <RefreshCw className={`w-3 h-3 text-muted ${isChecking ? 'animate-spin' : ''}`} />
               </div>

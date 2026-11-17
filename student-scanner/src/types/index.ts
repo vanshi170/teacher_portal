@@ -56,6 +56,5 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  isDemoMode: boolean;
   isBackendConnected: boolean;
 }

@@ -8,7 +8,6 @@ import {
   Camera, 
   QrCode, 
   RefreshCw, 
-  Sparkles, 
   ShieldCheck, 
   UserCheck, 
   FlipHorizontal, 
@@ -18,21 +17,19 @@ import {
 import confetti from 'canvas-confetti';
 import { useAuth } from './context/useAuth';
 import { submitAttendanceScan } from './services/api';
-import { PRESET_STUDENTS } from './data/presets';
 
 interface StudentScannerProps {
   onViewDashboard?: () => void;
 }
 
 export default function StudentScanner({ onViewDashboard }: StudentScannerProps) {
-  const { student, token, selectDemoStudent } = useAuth();
+  const { student, token } = useAuth();
 
   const [step, setStep] = useState<'info' | 'face' | 'qr' | 'success' | 'error'>('info');
   const [rollNo, setRollNo] = useState(() => student?.prn || '');
   const [studentName, setStudentName] = useState(() => student?.name || '');
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
-  const [devBypassGPS, setDevBypassGPS] = useState(true);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [scannedDetails, setScannedDetails] = useState<{
     subject?: string;
@@ -244,11 +241,7 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
     }
   };
 
-  const selectPreset = (p: typeof PRESET_STUDENTS[0]) => {
-    setRollNo(p.rollNo);
-    setStudentName(p.name);
-    selectDemoStudent(p.rollNo);
-  };
+
 
   return (
     <div className="flex flex-col items-center justify-center py-6 px-4 pb-20 md:pb-8 relative overflow-hidden">
@@ -273,8 +266,8 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
         <div className="flex justify-between items-center mb-6 text-xs bg-canvas/90 p-3 rounded-2xl border border-hot-pink/20 font-plex-mono shadow-sm">
           <div className="flex items-center gap-1.5 text-ink">
             <MapPin className="w-3.5 h-3.5 text-hot-pink" />
-            <span className={location || devBypassGPS ? 'text-present-green font-semibold' : 'text-amber-600'}>
-              {location ? 'GPS: Active' : devBypassGPS ? 'GPS: Dev Pass' : 'GPS: Searching'}
+            <span className={location ? 'text-present-green font-semibold' : 'text-amber-600'}>
+              {location ? 'GPS: Active' : 'GPS: Searching'}
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-ink">
@@ -312,45 +305,6 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
               />
             </div>
 
-            {/* Quick-test Presets from Class Roster */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] font-semibold text-muted flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-hot-pink" />
-                  Quick Roster Fill:
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {PRESET_STUDENTS.map((p) => (
-                  <button
-                    key={p.rollNo}
-                    type="button"
-                    onClick={() => selectPreset(p)}
-                    className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all ${
-                      rollNo === p.rollNo
-                        ? 'bg-hot-pink text-white border-hot-pink font-semibold shadow-sm'
-                        : 'bg-white/80 hover:bg-hot-pink/10 text-ink border-hot-pink/20'
-                    }`}
-                  >
-                    {p.name.split(' ')[0]} ({p.section})
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Dev Geofence Bypass Checkbox */}
-            <div className="flex items-center gap-2 pt-1 text-xs text-muted">
-              <input
-                type="checkbox"
-                id="devBypass"
-                checked={devBypassGPS}
-                onChange={(e) => setDevBypassGPS(e.target.checked)}
-                className="rounded accent-hot-pink w-4 h-4 cursor-pointer"
-              />
-              <label htmlFor="devBypass" className="cursor-pointer select-none">
-                Dev Mode (Allow testing away from campus)
-              </label>
-            </div>
 
             <button
               disabled={!rollNo.trim()}

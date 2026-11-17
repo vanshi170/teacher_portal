@@ -153,15 +153,9 @@ export async function submitAttendanceScan(
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Scan submission failed');
   } catch (err: any) {
-    // If backend is completely offline in local preview, simulate verified scan
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      return {
-        status: 'present',
-        message: 'Attendance recorded in Local Demo Mode! 🎉',
-        markedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-    }
-    throw err;
+    throw new Error(
+      err.message || 'Unable to submit attendance. Please check your connection and try again.'
+    );
   }
 }
 

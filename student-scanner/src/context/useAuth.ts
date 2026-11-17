@@ -19,7 +19,6 @@ export interface AuthContextType {
   }) => Promise<void>;
   updateStudent: (student: Student) => void;
   logout: () => void;
-  selectDemoStudent: (prn: string) => void;
   recheckConnection: () => Promise<void>;
 }
 

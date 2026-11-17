@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { Student } from '../types';
-import { DEMO_STUDENTS } from '../data/mockData';
 import { checkBackendHealth, loginStudent, registerStudent } from '../services/api';
 import { AuthContext } from './useAuth';
 
@@ -91,14 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('student_profile');
   };
 
-  const selectDemoStudent = (prn: string) => {
-    const matched = DEMO_STUDENTS.find(s => s.prn === prn) || DEMO_STUDENTS[0];
-    setStudent(matched);
-    const mockToken = `mock-jwt-token-for-${matched.prn}`;
-    setToken(mockToken);
-    localStorage.setItem('student_token', mockToken);
-    localStorage.setItem('student_profile', JSON.stringify(matched));
-  };
 
   return (
     <AuthContext.Provider
@@ -112,7 +103,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         updateStudent,
         logout,
-        selectDemoStudent,
         recheckConnection
       }}
     >
