@@ -15,9 +15,25 @@ const profilePhotoSchema = z.string().url().max(2048).refine(
 );
 
 export const registerSchema = z.object({
-  name: cleanString(100),
-  prn: cleanString(40),
-  email: z.string().trim().email().max(254),
+  name: cleanString(100).regex(
+    /^[a-zA-Z\s]+$/,
+    'Name must contain alphabets and spaces only.'
+  ),
+
+  prn: cleanString(40).regex(
+    /^[0-9]+$/,
+    'PRN must contain numbers only.'
+  ),
+
+  email: z.string()
+    .trim()
+    .email('Invalid email address.')
+    .max(254)
+    .regex(
+      /^[A-Z0-9._%+-]+@sitnagpur\.edu\.in$/i,
+      'Only @sitnagpur.edu.in email addresses are allowed.'
+    ),
+
   password: passwordSchema,
   department: cleanString(100),
   section: cleanString(10),
@@ -26,7 +42,10 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  prn: cleanString(40),
+  prn: cleanString(40).regex(
+    /^[0-9]+$/,
+    'PRN must contain numbers only.'
+  ),
   password: loginPasswordSchema
 });
 
