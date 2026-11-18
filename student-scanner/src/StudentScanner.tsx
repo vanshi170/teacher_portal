@@ -30,6 +30,7 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
   const [studentName, setStudentName] = useState(() => student?.name || '');
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
+  const [inputError, setInputError] = useState('');
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [scannedDetails, setScannedDetails] = useState<{
     subject?: string;
@@ -104,43 +105,50 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
   };
 
   // Step 1 -> Step 2: Face Verification
-  const startFaceVerification = async () => {
-  if (!/^[0-9]+$/.test(rollNo.trim())) {
-    alert('PRN must contain numbers only.');
+const startFaceVerification = async () => {
+  setInputError('');
+
+  if (!rollNo.trim()) {
+    setInputError('Invalid details: Please enter your PRN.');
     return;
   }
 
-  if (!/^[a-zA-Z\s]+$/.test(studentName.trim())) {
-    alert('Student name must contain alphabets only.');
+  if (!/^[0-9]+$/.test(rollNo.trim())) {
+    setInputError('Invalid details: PRN must contain numbers only.');
+    return;
+  }
+
+  if (studentName.trim() && !/^[a-zA-Z\s]+$/.test(studentName.trim())) {
+    setInputError('Invalid details: Student name must contain alphabets only.');
     return;
   }
 
   setStep('face');
   setStatusMessage('Position your face inside the circle...');
 
-    try {
-      stopAllStreams();
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
-      });
-      activeStreamRef.current = stream;
+  try {
+    stopAllStreams();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+    });
+    activeStreamRef.current = stream;
 
-      if (webcamVideoRef.current) {
-        webcamVideoRef.current.srcObject = stream;
-        await webcamVideoRef.current.play().catch(() => {});
-      }
-
-      // Simulate biometric face verification check (2s)
-      setTimeout(() => {
-        stopAllStreams();
-        setStatusMessage('Face Verified ✓ Launching QR Scanner...');
-        setTimeout(() => startQrScanner(), 600);
-      }, 2000);
-    } catch (err: any) {
-      alert('Camera access denied or unavailable: ' + (err.message || err));
-      setStep('info');
+    if (webcamVideoRef.current) {
+      webcamVideoRef.current.srcObject = stream;
+      await webcamVideoRef.current.play().catch(() => {});
     }
-  };
+
+    setTimeout(() => {
+      stopAllStreams();
+      setStatusMessage('Face Verified ✓ Launching QR Scanner...');
+      setTimeout(() => startQrScanner(), 600);
+    }, 2000);
+
+  } catch (err: any) {
+    alert('Camera access denied or unavailable: ' + (err.message || err));
+    setStep('info');
+  }
+};
 
   // Step 2 -> Step 3: QR Scanner using html5-qrcode
   const startQrScanner = (mode: 'user' | 'environment' = facingMode) => {
@@ -320,12 +328,14 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
 />
             </div>
 
+            {inputError && (
+              <p className="text-xs text-red-600 font-medium mt-2">
+                {inputError}
+              </p>
+            )}
 
            <button
-  disabled={
-    !/^[0-9]+$/.test(rollNo.trim()) ||
-    !/^[a-zA-Z\s]+$/.test(studentName.trim())
-  }
+  disabled={false}
   onClick={startFaceVerification}
   className="w-full h-12 mt-2 bg-gradient-to-r from-hot-pink to-[#E05D97] hover:from-[#E05D97] hover:to-hot-pink disabled:opacity-40 text-white font-sora font-semibold rounded-2xl shadow-lg shadow-hot-pink/30 flex items-center justify-center gap-2 transition-transform active:scale-95 cursor-pointer disabled:cursor-not-allowed"
 >
