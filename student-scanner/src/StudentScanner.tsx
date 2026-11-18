@@ -322,8 +322,8 @@ const startFaceVerification = async () => {
   type="text"
   placeholder="e.g. Arushi Varghese"
   value={studentName}
-  onChange={(e) => {
-  setRollNo(e.target.value);
+ onChange={(e) => {
+  setStudentName(e.target.value);
   setInputError('');
 }}
   className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
