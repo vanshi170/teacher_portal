@@ -306,9 +306,10 @@ const startFaceVerification = async () => {
   pattern="[0-9]*"
   placeholder="e.g. 25070521001"
   value={rollNo}
-  onChange={(e) =>
-    setRollNo(e.target.value.replace(/[^0-9]/g, ''))
-  }
+  onChange={(e) => {
+  setRollNo(e.target.value);
+  setInputError('');
+}}
   className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 font-plex-mono text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
 />
             </div>
@@ -321,9 +322,10 @@ const startFaceVerification = async () => {
   type="text"
   placeholder="e.g. Arushi Varghese"
   value={studentName}
-  onChange={(e) =>
-    setStudentName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))
-  }
+  onChange={(e) => {
+  setRollNo(e.target.value);
+  setInputError('');
+}}
   className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
 />
             </div>
