@@ -105,9 +105,18 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
 
   // Step 1 -> Step 2: Face Verification
   const startFaceVerification = async () => {
-    if (!rollNo.trim()) return;
-    setStep('face');
-    setStatusMessage('Position your face inside the circle...');
+  if (!/^[0-9]+$/.test(rollNo.trim())) {
+    alert('PRN must contain numbers only.');
+    return;
+  }
+
+  if (!/^[a-zA-Z\s]+$/.test(studentName.trim())) {
+    alert('Student name must contain alphabets only.');
+    return;
+  }
+
+  setStep('face');
+  setStatusMessage('Position your face inside the circle...');
 
     try {
       stopAllStreams();
@@ -284,12 +293,16 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
                 PRN / Roll Number <span className="text-hot-pink">*</span>
               </label>
               <input
-                type="text"
-                placeholder="e.g. 25070521001"
-                value={rollNo}
-                onChange={(e) => setRollNo(e.target.value)}
-                className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 font-plex-mono text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
-              />
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  placeholder="e.g. 25070521001"
+  value={rollNo}
+  onChange={(e) =>
+    setRollNo(e.target.value.replace(/[^0-9]/g, ''))
+  }
+  className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 font-plex-mono text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
+/>
             </div>
 
             <div>
@@ -297,20 +310,25 @@ export default function StudentScanner({ onViewDashboard }: StudentScannerProps)
                 Student Name <span className="text-muted font-normal lowercase">(auto-detected from session)</span>
               </label>
               <input
-                type="text"
-                placeholder="e.g. Arushi Varghese"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
-              />
+  type="text"
+  placeholder="e.g. Arushi Varghese"
+  value={studentName}
+  onChange={(e) =>
+    setStudentName(e.target.value.replace(/[^a-zA-Z\s]/g, ''))
+  }
+  className="w-full bg-canvas text-ink placeholder:text-muted/60 border border-hot-pink/20 rounded-xl h-12 px-4 text-sm focus:ring-2 focus:ring-hot-pink focus:border-transparent outline-none transition-all shadow-inner"
+/>
             </div>
 
 
-            <button
-              disabled={!rollNo.trim()}
-              onClick={startFaceVerification}
-              className="w-full h-12 mt-2 bg-gradient-to-r from-hot-pink to-[#E05D97] hover:from-[#E05D97] hover:to-hot-pink disabled:opacity-40 text-white font-sora font-semibold rounded-2xl shadow-lg shadow-hot-pink/30 flex items-center justify-center gap-2 transition-transform active:scale-95 cursor-pointer disabled:cursor-not-allowed"
-            >
+           <button
+  disabled={
+    !/^[0-9]+$/.test(rollNo.trim()) ||
+    !/^[a-zA-Z\s]+$/.test(studentName.trim())
+  }
+  onClick={startFaceVerification}
+  className="w-full h-12 mt-2 bg-gradient-to-r from-hot-pink to-[#E05D97] hover:from-[#E05D97] hover:to-hot-pink disabled:opacity-40 text-white font-sora font-semibold rounded-2xl shadow-lg shadow-hot-pink/30 flex items-center justify-center gap-2 transition-transform active:scale-95 cursor-pointer disabled:cursor-not-allowed"
+>
               <Camera className="w-5 h-5" />
               <span>Verify Face & Scan QR</span>
             </button>
