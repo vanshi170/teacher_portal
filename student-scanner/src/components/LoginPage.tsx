@@ -34,28 +34,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!loginPrn.trim()) {
-      setError('Please enter your PRN or Roll Number.');
-      return;
-    }
-    if (!loginPassword.trim()) {
-      setError('Please enter your password.');
-      return;
-    }
+const handleLoginSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
 
-    setIsSubmitting(true);
-    try {
-      await login(loginPrn.trim(), loginPassword);
-      if (onSuccess) onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in. Please verify your PRN and password.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  if (!loginPrn.trim()) {
+    setError('Invalid details: Please enter your PRN.');
+    return;
+  }
+
+  if (!/^[0-9]+$/.test(loginPrn.trim())) {
+    setError('Invalid details: PRN must contain numbers only.');
+    return;
+  }
+
+  if (!loginPassword.trim()) {
+    setError('Please enter your password.');
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    await login(loginPrn.trim(), loginPassword);
+    if (onSuccess) onSuccess();
+  } catch (err: any) {
+    setError(err.message || 'Failed to sign in. Please verify your PRN and password.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
